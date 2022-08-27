@@ -83,24 +83,16 @@ def Widgets():
                     padx=20)
 
 
-# Defining Browse() to select a
-# destination folder to save the video
+
 
 def Browse():
-    # Presenting user with a pop-up for
-    # directory selection. initialdir
-    # argument is optional Retrieving the
-    # user-input destination directory and
-    # storing it in downloadDirectory
+
     download_Directory = filedialog.askdirectory(
         initialdir="YOUR DIRECTORY PATH", title="Save Video")
 
-    # Displaying the directory in the directory
-    # textbox
+
     download_Path.set(download_Directory)
 
-
-# Defining Download() to download the video
 
 def Download():
     if len(video_Link.get()) > 0:
@@ -153,12 +145,9 @@ def downloadVideoAudio():
         messagebox.showerror("ERROR",
                             "Não foi possivel realizar o download do vídeo! Verifique se a playlist é publica e tente novamente!")
 
-# Creating object of tk class
+
 root = tk.Tk()
 
-# Setting the title, background color
-# and size of the tkinter window and
-# disabling the resizing property
 root.geometry("520x300")
 root.resizable(False, False)
 root.title("YouTube Video Downloader")
