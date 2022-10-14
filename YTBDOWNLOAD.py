@@ -2,7 +2,6 @@ from pytube import YouTube, Playlist
 import tkinter as tk
 from tkinter import *
 from tkinter import messagebox, filedialog
-
 def Widgets():
     head_label = Label(root, text="YouTube Video Downloader",
                        padx=10,
@@ -48,6 +47,14 @@ def Widgets():
                            pady=5,
                            padx=5)
 
+    videoRdBtn = Radiobutton(text="Video",
+                          variable=optionFormatDownload, value=0, highlightthickness=0)
+    videoRdBtn.grid(column=1, row=5, sticky="W")
+
+    audioRdBtn = Radiobutton(text="Audio",
+                         variable=optionFormatDownload, value=1, highlightthickness=0)
+    audioRdBtn.grid(column=1, row=5, pady=1, padx=70, sticky="W")
+
     root.destinationText = Entry(root,
                                  width=27,
                                  textvariable=download_Path,
@@ -82,9 +89,6 @@ def Widgets():
                     pady=20,
                     padx=20)
 
-
-
-
 def Browse():
 
     download_Directory = filedialog.askdirectory(
@@ -115,7 +119,13 @@ def downloadPlaylistAudio():
 
         for url in p.video_urls:
             yt = YouTube(url)
-            audio = yt.streams.filter(only_audio=True)[0]
+            if (optionFormatDownload == 1):
+                audio = yt.streams.filter(only_audio=True)[0]
+                audio.download(download_Path.get())
+            if (optionFormatDownload == 0):
+                video = yt.streams.filter(file_extension='mp4')[1]
+                video.download(download_Path.get())
+
             audio.download(download_Path.get())
             print(yt.title)
         print("Finalizado. Salvo em " + download_Path.get())
@@ -133,13 +143,17 @@ def downloadVideoAudio():
 
         yt = YouTube(link)
         print("Baixando o vídeo", yt.title)
-
-        audio = yt.streams.filter(only_audio=True)[0]
-        audio.download(download_Path.get())
+        print(optionFormatDownload.get())
+        if(optionFormatDownload.get() == 1):
+            audio = yt.streams.filter(only_audio=True)[0]
+            audio.download(download_Path.get())
+        if (optionFormatDownload.get() == 0):
+            video = yt.streams.filter(file_extension='mp4')[1]
+            video.download(download_Path.get())
 
         print("Finalizado. Salvo em " + download_Path.get())
         messagebox.showinfo("SUCESSO",
-                            "O AUDIO DO VÍDEO"+yt.title+" FOI SALVO EM \n"
+                            "O AUDIO DO VÍDEO "+yt.title+" FOI SALVO EM \n"
                             + download_Path.get())
     except:
         messagebox.showerror("ERROR",
@@ -156,6 +170,7 @@ root.config(background="Black")
 # Creating the tkinter Variables
 video_Link = StringVar()
 download_Path = StringVar()
+optionFormatDownload = IntVar()
 
 # Calling the Widgets() function
 Widgets()
