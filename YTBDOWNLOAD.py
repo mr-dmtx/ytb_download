@@ -126,7 +126,6 @@ def downloadPlaylistAudio():
                 video = yt.streams.filter(file_extension='mp4')[1]
                 video.download(download_Path.get())
 
-            audio.download(download_Path.get())
             print(yt.title)
         print("Finalizado. Salvo em " + download_Path.get())
         messagebox.showinfo("SUCESSO",
