@@ -119,10 +119,10 @@ def downloadPlaylistAudio():
 
         for url in p.video_urls:
             yt = YouTube(url)
-            if (optionFormatDownload == 1):
+            if (optionFormatDownload.get() == 1):
                 audio = yt.streams.filter(only_audio=True)[0]
                 audio.download(download_Path.get())
-            if (optionFormatDownload == 0):
+            if (optionFormatDownload.get() == 0):
                 video = yt.streams.filter(file_extension='mp4')[1]
                 video.download(download_Path.get())
 
