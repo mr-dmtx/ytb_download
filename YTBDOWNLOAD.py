@@ -1,179 +1,105 @@
 from pytube import YouTube, Playlist
-import tkinter as tk
-from tkinter import *
-from tkinter import messagebox, filedialog
-def Widgets():
-    head_label = Label(root, text="YouTube Video Downloader",
-                       padx=10,
-                       pady=15,
-                       font="SegoeUI 20",
-                       bg="black",
-                       fg="white")
-    head_label.grid(row=1,
-                    column=1,
-                    pady=10,
-                    padx=10,
-                    columnspan=2)
+from kivy.lang import Builder
+from kivymd.app import MDApp
+import os
+from kivy.core.window import Window
+from kivymd.app import MDApp
+from kivymd.uix.filemanager import MDFileManager
+from kivymd.toast import toast
+from kivymd.icon_definitions import md_icons
 
-    link_label = Label(root,
-                       text="YouTube Link :",
-                       bg="black",
-                       fg="white",
-                       pady=5,
-                       padx=5)
-    link_label.grid(row=2,
-                    column=0,
-                    pady=5,
-                    padx=5)
+class App(MDApp):
 
-    root.linkText = Entry(root,
-                          width=35,
-                          textvariable=video_Link,
-                          font="Arial 14")
-    root.linkText.grid(row=2,
-                       column=1,
-                       pady=5,
-                       padx=5,
-                       columnspan=2)
+    pathdownload = ""
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Window.bind(on_keyboard=self.events)
+        self.manager_open = False
+        self.file_manager = MDFileManager(
+            exit_manager=self.exit_manager, select_path=self.select_path
+        )
+    def build(self):
+        self.theme_cls.theme_style = "Dark"
+        self.theme_cls.primary_palette = "Orange"
+        return None
 
-    destination_label = Label(root,
-                              text="Pasta destino:",
-                              bg="black",
-                              fg="white",
-                              pady=5,
-                              padx=9)
-    destination_label.grid(row=3,
-                           column=0,
-                           pady=5,
-                           padx=5)
+    def file_manager_open(self):
+        self.file_manager.show_disks()  # output manager to the screen
+        self.manager_open = True
 
-    videoRdBtn = Radiobutton(text="Video",
-                          variable=optionFormatDownload, value=0, highlightthickness=0)
-    videoRdBtn.grid(column=1, row=5, sticky="W")
+    def select_path(self, path: str):
+        self.pathdownload = path
+        self.exit_manager()
+        self.Download()
 
-    audioRdBtn = Radiobutton(text="Audio",
-                         variable=optionFormatDownload, value=1, highlightthickness=0)
-    audioRdBtn.grid(column=1, row=5, pady=1, padx=70, sticky="W")
+    def exit_manager(self, *args):
+        self.manager_open = False
+        self.file_manager.close()
 
-    root.destinationText = Entry(root,
-                                 width=27,
-                                 textvariable=download_Path,
-                                 font="Arial 14")
-    root.destinationText.grid(row=3,
-                              column=1,
-                              pady=5,
-                              padx=5)
+    def events(self, instance, keyboard, keycode, text, modifiers):
+        '''Called when buttons are pressed on the mobile device.'''
 
-    browse_B = Button(root,
-                      text="Procurar",
-                      command=Browse,
-                      width=10,
-                      bg="gray",
-                      relief=GROOVE)
-    browse_B.grid(row=3,
-                  column=2,
-                  pady=1,
-                  padx=1)
+        if keyboard in (1001, 27):
+            if self.manager_open:
+                self.file_manager.back()
+        return True
 
-    Download_B = Button(root,
-                        text="BAIXAR VIDEO",
-                        command=Download,
-                        width=20,
-                        bg="gray",
-                        pady=10,
-                        padx=15,
-                        relief=GROOVE,
-                        font="Georgia, 13")
-    Download_B.grid(row=6,
-                    column=1,
-                    pady=20,
-                    padx=20)
-
-def Browse():
-
-    download_Directory = filedialog.askdirectory(
-        initialdir="YOUR DIRECTORY PATH", title="Save Video")
-
-
-    download_Path.set(download_Directory)
-
-
-def Download():
-    if len(video_Link.get()) > 0:
-        if "playlist" not in video_Link.get():
-            downloadVideoAudio()
+    def Download(self):
+        formato = 0
+        if (self.root.ids.audio.state == "down"):
+            formato = 1
         else:
-            downloadPlaylistAudio()
-    else:
-        messagebox.showerror("ERRO", "ENDEREÇO INVÁLIDO! VERIFIQUE O LINK DO VIDEO!")
+            formato = 2
+        video_Link = self.root.ids.urlYoutube.text
+
+        if len(video_Link) > 0:
+            if "playlist" not in video_Link:
+                self.downloadVideo(video_Link, self.pathdownload, formato)
+            else:
+                self.downloadPlaylist(video_Link, self.pathdownload, formato)
+        else:
+            toast("ENDEREÇO INVÁLIDO! VERIFIQUE O LINK DO VIDEO!")
 
 
-def downloadPlaylistAudio():
-    try:
-        print("Link da playlist:")
-        link = video_Link.get()
+    def downloadPlaylist(self, video_Link, path, opcaoFormato):
+        try:
+            link = video_Link
 
-        p = Playlist(link)
+            p = Playlist(link)
 
-        print("Baixando a playlist "+ p.title)
+            toast("Baixando a playlist "+ p.title)
 
-        for url in p.video_urls:
-            yt = YouTube(url)
-            if (optionFormatDownload.get() == 1):
+            for url in p.video_urls:
+                yt = YouTube(url)
+                if (opcaoFormato == 1):
+                    audio = yt.streams.filter(only_audio=True)[0]
+                    audio.download(path)
+                if (opcaoFormato == 2):
+                    video = yt.streams.filter(file_extension='mp4')[1]
+                    video.download(path)
+
+            toast("Finalizado. Salvo em " + path)
+            toast("A PLAYLIST "+p.title+" FOI SALVA EM \n"
+                                + path)
+        except:
+            toast("Não foi possivel realizar o download da playlist! Tente novamente!")
+
+
+    def downloadVideo(self, video_Link, path, opcaoFormato):
+        try:
+            link = video_Link
+            yt = YouTube(link)
+            toast("Baixando o vídeo "+ yt.title)
+            if(opcaoFormato == 1):
                 audio = yt.streams.filter(only_audio=True)[0]
-                audio.download(download_Path.get())
-            if (optionFormatDownload.get() == 0):
+                audio.download(path)
+            if (opcaoFormato == 2):
                 video = yt.streams.filter(file_extension='mp4')[1]
-                video.download(download_Path.get())
+                video.download(path)
 
-            print(yt.title)
-        print("Finalizado. Salvo em " + download_Path.get())
-        messagebox.showinfo("SUCESSO",
-                            "A PLAYLIST "+p.title+" FOI SALVA EM \n"
-                            + download_Path.get())
-    except:
-        messagebox.showerror("ERROR","Não foi possivel realizar o download da playlist! Tente novamente!")
+            toast("O VÍDEO "+yt.title+" FOI SALVO EM \n"
+                                + path)
+        except:
+            toast("Não foi possivel realizar o download do vídeo! Verifique se o vídeo é publica e tente novamente!")
 
-
-def downloadVideoAudio():
-    try:
-        print("Link do vídeo:")
-        link = video_Link.get()
-
-        yt = YouTube(link)
-        print("Baixando o vídeo", yt.title)
-        print(optionFormatDownload.get())
-        if(optionFormatDownload.get() == 1):
-            audio = yt.streams.filter(only_audio=True)[0]
-            audio.download(download_Path.get())
-        if (optionFormatDownload.get() == 0):
-            video = yt.streams.filter(file_extension='mp4')[1]
-            video.download(download_Path.get())
-
-        print("Finalizado. Salvo em " + download_Path.get())
-        messagebox.showinfo("SUCESSO",
-                            "O AUDIO DO VÍDEO "+yt.title+" FOI SALVO EM \n"
-                            + download_Path.get())
-    except:
-        messagebox.showerror("ERROR",
-                            "Não foi possivel realizar o download do vídeo! Verifique se a playlist é publica e tente novamente!")
-
-
-root = tk.Tk()
-
-root.geometry("520x300")
-root.resizable(False, False)
-root.title("YouTube Video Downloader")
-root.config(background="Black")
-
-# Creating the tkinter Variables
-video_Link = StringVar()
-download_Path = StringVar()
-optionFormatDownload = IntVar()
-
-# Calling the Widgets() function
-Widgets()
-
-# Defining infinite loop to run
-# application
-root.mainloop()
+App().run()

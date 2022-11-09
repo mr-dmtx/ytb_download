@@ -1,0 +1,46 @@
+<App@FloatLayout>:
+    MDLabel:
+        text: "YTB DOWNLOAD"
+        pos_hint: {"center_x": .8, "center_y": .9}
+        font_style: "H3"
+
+    MDTextField:
+        id: urlYoutube
+        icon_right: "youtube"
+        hint_text: "Link do vídeo ou playlist"
+        mode: "fill"
+        pos_hint: {"center_x": .5, "center_y": .7}
+        spacing: "20dp"
+        adaptive_height: True
+        size_hint_x: .8
+
+    MDCheckbox:
+        id: audio
+        size_hint: None, None
+        size: "48dp", "48dp"
+        group: 'group'
+        pos_hint: {"center_x": .4, "center_y": .6}
+        active: True
+        color_inactive: "orange"
+    MDLabel:
+        text: "Audio (mp3)"
+        pos_hint: {"center_x": .92, "center_y": .6}
+
+    MDCheckbox:
+        id: video
+        size_hint: None, None
+        size: "48dp", "48dp"
+        group: 'group'
+        pos_hint: {"center_x": .4, "center_y": .52}
+        color_inactive: "orange"
+    MDLabel:
+        text: "Video (mp4)"
+        pos_hint: {"center_x": .92, "center_y": .52}
+
+    MDRectangleFlatIconButton:
+        icon: "arrow-down-bold-box"
+        text: "Escolher pasta e salvar"
+        pos_hint: {"center_x": .5, "center_y": .4}
+        size_hint_x: .8
+        on_release: app.file_manager_open()
+App:
