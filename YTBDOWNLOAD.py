@@ -16,7 +16,7 @@ class App(MDApp):
         Window.bind(on_keyboard=self.events)
         self.manager_open = False
         self.file_manager = MDFileManager(
-            exit_manager=self.exit_manager, select_path=self.select_path
+            exit_manager=self.exit_manager, select_path=self.select_path,
         )
     def build(self):
         self.theme_cls.theme_style = "Dark"
@@ -30,12 +30,12 @@ class App(MDApp):
     def select_path(self, path: str):
         self.pathdownload = path
         self.exit_manager()
-        self.Download()
 
     def exit_manager(self, *args):
         self.manager_open = False
         self.file_manager.close()
 
+        self.Download()
     def events(self, instance, keyboard, keycode, text, modifiers):
         '''Called when buttons are pressed on the mobile device.'''
 
@@ -72,10 +72,10 @@ class App(MDApp):
             for url in p.video_urls:
                 yt = YouTube(url)
                 if (opcaoFormato == 1):
-                    audio = yt.streams.filter(only_audio=True)[0]
+                    audio = yt.streams.filter(only_audio=True, file_extension='mp4').desc()[0]
                     audio.download(path)
                 if (opcaoFormato == 2):
-                    video = yt.streams.filter(file_extension='mp4')[1]
+                    video = yt.streams.filter(file_extension='mp4', only_video=True)[0]
                     video.download(path)
 
             toast("Finalizado. Salvo em " + path)
@@ -91,10 +91,10 @@ class App(MDApp):
             yt = YouTube(link)
             toast("Baixando o vídeo "+ yt.title)
             if(opcaoFormato == 1):
-                audio = yt.streams.filter(only_audio=True)[0]
+                audio = yt.streams.filter(only_audio=True, file_extension='mp4').desc()[0]
                 audio.download(path)
             if (opcaoFormato == 2):
-                video = yt.streams.filter(file_extension='mp4')[1]
+                video = yt.streams.filter(file_extension='mp4', only_video=True)[0]
                 video.download(path)
 
             toast("O VÍDEO "+yt.title+" FOI SALVO EM \n"

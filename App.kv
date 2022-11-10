@@ -1,8 +1,10 @@
 <App@FloatLayout>:
     MDLabel:
         text: "YTB DOWNLOAD"
-        pos_hint: {"center_x": .8, "center_y": .9}
+        halign: "center"
+        pos_hint:{"center_y": .9}
         font_style: "H3"
+        adaptive_height: True
 
     MDTextField:
         id: urlYoutube
@@ -19,23 +21,25 @@
         size_hint: None, None
         size: "48dp", "48dp"
         group: 'group'
-        pos_hint: {"center_x": .4, "center_y": .6}
+        pos_hint: {"center_x": .45, "center_y": .6}
         active: True
         color_inactive: "orange"
     MDLabel:
-        text: "Audio (mp3)"
-        pos_hint: {"center_x": .92, "center_y": .6}
+        text: "Audio"
+        halign: "center"
+        pos_hint: {"center_y": .6}
 
     MDCheckbox:
         id: video
         size_hint: None, None
         size: "48dp", "48dp"
         group: 'group'
-        pos_hint: {"center_x": .4, "center_y": .52}
+        pos_hint: {"center_x": .45, "center_y": .53}
         color_inactive: "orange"
     MDLabel:
-        text: "Video (mp4)"
-        pos_hint: {"center_x": .92, "center_y": .52}
+        text: "Vídeo"
+        halign: "center"
+        pos_hint: { "center_y": .53}
 
     MDRectangleFlatIconButton:
         icon: "arrow-down-bold-box"
